@@ -1,0 +1,76 @@
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<STYLE TYPE="text/css">
+<!--
+  /*@import url(css/oj-redwood-min.css);*/
+-->
+</STYLE>
+<div id="circle"></div>
+<div class="">
+    <h1>Nuevo Concepto</h1>
+    <hr/>   
+    <h3 class="oj-typography-heading-sm">FSN:</h3>    
+    <oj-form-layout id="ofl1" label-edge="inside" max-columns="1">         
+        <oj-radioset
+                label-hint="Sensibilidad"
+                id="sensibility-fsn"
+                value="{{fsnSensibility}}">
+                <oj-option value=false>Insensible</oj-option>
+                <oj-option value=true>Sensible</oj-option>
+        </oj-radioset>
+        <oj-text-area
+          id="term-fsn"
+          label-hint="Término"
+          rows="1"
+          slot="value"          
+          value="{{fsnTerm}}">              
+        </oj-text-area>
+    </oj-form-layout>
+    
+    <h1 class="oj-typography-heading-sm">Preferida:</h1>    
+    <oj-form-layout id="ofl1" label-edge="inside" max-columns="1">
+        <oj-radioset
+                label-hint="Sensibilidad"
+                id="sensibility-fsn"
+                value="{{favoriteSensibility}}">
+                <oj-option value="false">Insensible</oj-option>
+                <oj-option value="true">Sensible</oj-option>
+        </oj-radioset>
+        <oj-text-area
+          id="term-fsn"
+          label-hint="Término"
+          rows="1" style="width:100%"
+          slot="value"          
+          value="{{favoriteTerm}}">              
+        </oj-text-area>
+    </oj-form-layout>
+    
+    <oj-tab-bar
+        selection="{{selectedItem}}"
+        data="[[dataProvider]]"
+        edge="top"
+        display="all">
+        <template slot="itemTemplate" data-oj-as="item">
+          <li :class="[[{'oj-disabled' : item.data.disabled === 'true'}]]">
+            <a href="#">
+              <span :class="[['oj-tabbar-item-icon ' + item.data.icons]]"></span>
+              <oj-bind-text value="[[item.data.name]]"></oj-bind-text>
+            </a>
+          </li>
+        </template>
+    </oj-tab-bar>
+    
+    <div>
+      <div data-bind="ojModule: { name: 'descriptions', params: {descriptionsModel: conceptModel}}"
+      class="oj-sm-padding-4x">
+      </div>
+    </div>
+    
+
+</div>     
+<br>
+<div style="width: 1px; min-width: 100%;">   
+</div>
