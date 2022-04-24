@@ -74,7 +74,7 @@ define(['knockout',
               return item.id === self.selectedCategory();
             });
             
-            console.log(JSON.stringify(self.selectedCategoryModel().get("name")));
+            console.log(JSON.stringify(self.selectedCategoryModel()));
 
             if (!match) { 
                 while(self.tabData().length > 0) {                    

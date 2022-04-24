@@ -20,7 +20,6 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
     function conceptContentViewModel(params) {
         
         var self = this;        
-       
         
         self.name = ko.observable();
         
@@ -33,39 +32,61 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
         self.favoriteSensibility = ko.observable(false);
         self.favoriteTerm = ko.observable("");
         
-        self.selectedItem = ko.observable("descriptions");
-        
-        const data = [
-                  { name: "Otras Descripciones", id: "descriptions" },
-                  { name: "Atributos", id: "Attributes"}
-              ];              
+        self.selectedItem = ko.observable("descriptions");             
               
-        this.dataProvider = new ArrayDataProvider(data, { keyAttributes: "id" });       
+        self.dataProvider = ko.observableArray();
         
-        self.conceptModel = ko.computed(function () {
+        self.conceptModel = ko.observable();
+        
+        self.tabs = ko.observableArray();               
+        
+        self.relationshipDefinitionsModel = ko.observableArray();
+        
+        self.conceptModel1 = ko.computed(function () {
             
             //console.log(JSON.stringify(params));            
             if (typeof params.categoryModel() === 'undefined') {
                 return;
             }                                                                                                           
             
-            var categoryId = params.categoryModel().get('id');   
-            var conceptModel = {};
+            var categoryId = params.categoryModel().get('id');               
 
             $.getJSON("http://dnssemantikos:8080/ws/rest/concepts/new/" + categoryId).
                 then(function (concept) {                    
-                    console.log(JSON.stringify(concept));
-                    conceptModel = concept;                                                    
+                    console.log(JSON.stringify(concept.validDescriptionsButFSNandFavorite));
+                    self.conceptModel(concept);  
+                    
+                    console.log(self.conceptModel());
                     
                     self.fsnSensibility(concept.validDescriptionFSN.caseSensitive.toString());
                     self.fsnTerm(concept.validDescriptionFSN.term);   
 
                     self.favoriteSensibility(concept.validDescriptionFavorite.caseSensitive.toString());
                     self.favoriteTerm(concept.validDescriptionFavorite.term);  
-                });                                           
-                 
-            return conceptModel;
+                });   
+                
+            $.getJSON("http://dnssemantikos:8080/ws/rest/relationshipDefinitions/smtk/" + categoryId).
+                then(function (relationshipDefinitions) {                                        
+                    self.relationshipDefinitionsModel(relationshipDefinitions);                     
+                    
+                    console.log(self.relationshipDefinitionsModel());
+                    
+                    if(relationshipDefinitions.length !== 0) {                        
+                        self.tabs([
+                            { name: "Otras Descripciones", id: "descriptions" },
+                            { name: "Atributos", id: "Attributes"}
+                        ]);                                                    
+                    }
+                    else {                                
+                        self.tabs([{ name: "Otras Descripciones", id: "descriptions" }]);                         
+                    }
+                    
+            });                          
+                
+            return params;
         });
+        
+         self.dataProvider = new ArrayDataProvider(self.tabs, { keyAttributes: "id" });
                 
                             
     }

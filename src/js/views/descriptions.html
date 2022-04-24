@@ -10,10 +10,149 @@ and open the template in the editor.
 </STYLE>
 <div id="circle"></div>
 <div class="">
-    <h1>Otras Descripciones</h1>
-    <hr/>       
+     
+    <oj-form-layout id="ofl1" label-edge="inside" max-columns="1">
+        <oj-select-single 
+              id="descriptionType" 
+              label-hint="Tipo Descriptor"                    
+              value="{{descriptionType}}"                        
+              required
+              item-text="[[getItemText]]"
+              data="[[descriptionTypes]]">
+        </oj-select-single>  
+        
+        <oj-radioset
+            label-hint="Sensibilidad"
+            id="sensibility"
+            value="{{sensibility}}">
+            <oj-option value="false">Insensible</oj-option>
+            <oj-option value="true">Sensible</oj-option>
+        </oj-radioset>
+        
+        <oj-text-area
+          id="term-fsn"
+          label-hint="Término"
+          rows="1" style="width:100%"
+          slot="value"          
+          value="{{term}}">              
+        </oj-text-area>
+    </oj-form-layout>
+    
+    <oj-table id="table"
+              aria-label="Departments Table"
+              class='oj-bg-body demo-table-container'
+              dnd='{"reorder": {"columns": "enabled"}}'
+              data='[[datasource]]'
+              style="width:100%"
+              edit-mode='rowEdit'
+              edit-row='{{editRow}}'
+              on-oj-before-row-edit='[[beforeRowEditListener]]'
+              on-oj-before-row-edit-end='[[beforeRowEditEndListener]]'
+              columns-default.sortable='disabled'              
+              columns='[                         
+                        {"field":"term",
+                         "sortable": "enabled",
+                         "headerText": "Término",
+                         "weight": "2",
+                         "minWidth": "10rem",
+                         "template": "termTemplate"},
+                        {"field":"descriptionType",
+                          "headerText": "Tipo Descriptor",
+                          "sortable": "enabled",
+                          "minWidth": "8rem",
+                          "weight": "2",
+                          "template": "descriptionTypeTemplate"},
+                        {"field":"caseSensitive",
+                          "sortable": "enabled",
+                          "weight": "2",
+                          "minWidth": "10rem",
+                          "headerText": "Sensibilidad",
+                          "template": "caseSensitiveTemplate"},                        
+                        { "headerText": "Action",                                                                              
+                          "headerStyle": "text-align: center;",
+                          "style":"padding-top: 0px; padding-bottom: 0px; text-align: center;",
+                          "template": "actionTemplate"}]'>
+
+      <template slot="termTemplate" data-oj-as="cell">
+        <oj-bind-if test='[[cell.mode=="navigation"]]'>
+          <oj-bind-text value="[[cell.data]]"></oj-bind-text>
+        </oj-bind-if>
+
+        <oj-bind-if test='[[cell.mode=="edit"]]'>            
+          <oj-input-text id="it1" value="{{rowData.term}}" class="editable"></oj-input-text>
+        </oj-bind-if>
+      </template>
+        
+      <template slot="descriptionTypeTemplate" data-oj-as="cell">
+        <oj-bind-if test='[[cell.mode=="navigation"]]'>
+          <oj-bind-text value="[[cell.data.name]]"></oj-bind-text>
+        </oj-bind-if>
+
+        <oj-bind-if test='[[cell.mode=="edit"]]'>          
+          <oj-select-single 
+              id="descriptionType" 
+              label-hint="Tipo Descriptor"                    
+              value="{{rowData.descriptionType}}"                        
+              required
+              item-text="[[getItemText]]"
+              data="[[descriptionTypes]]">
+              <template slot="itemTemplate" data-oj-as="item">
+                  <oj-list-item-layout style="padding:0em">                              
+                      <span>
+                        <oj-bind-text value="[[item.data.name]]"></oj-bind-text>
+                      </span>                       
+                  </oj-list-item-layout>
+              </template>
+          </oj-select-single>  
+        </oj-bind-if>
+      </template>              
+        
+      <template slot="caseSensitiveTemplate" data-oj-as="cell">
+        <oj-bind-if test='[[cell.mode=="navigation"]]'>
+          <oj-bind-text value="[[cell.data]]"></oj-bind-text>
+        </oj-bind-if>
+
+        <oj-bind-if test='[[cell.mode=="edit"]]'>          
+          <oj-select-single 
+              id="descriptionType" 
+              label-hint="Sensibilidad"                    
+              value="{{rowData.caseSensitive}}"                        
+              required
+              item-text="[[getItemText]]"
+              data="[[caseSensitives]]">
+              <template slot="itemTemplate" data-oj-as="item">
+                  <oj-list-item-layout style="padding:0em">                              
+                      <span>
+                        <oj-bind-text value="[[item.data]]"></oj-bind-text>
+                      </span>                       
+                  </oj-list-item-layout>
+              </template>
+          </oj-select-single>  
+        </oj-bind-if>
+      </template>
+        
+      <template slot="actionTemplate" data-oj-as="cell">
+        <oj-bind-if test='[[cell.mode=="navigation"]]'>
+          <oj-button display='icons' chroming='borderless' on-oj-action="[[handleUpdate]]">
+            <span slot='startIcon' class="oj-ux-ico-edit"></span>
+            Edit
+          </oj-button>
+        </oj-bind-if>
+
+        <oj-bind-if test='[[cell.mode=="edit"]]'>
+          <oj-toolbar class="oj-sm-padding-0-vertical">
+            <oj-button display='icons' on-oj-action="[[handleDone]]">
+              <span slot='startIcon' class="oj-ux-ico-check"></span>
+              Save
+            </oj-button>
+            <oj-button display='icons' on-oj-action="[[handleCancel]]">
+              <span slot='startIcon' class="oj-ux-ico-multiply"></span>
+              Cancel
+            </oj-button>
+          </oj-toolbar>
+        </oj-bind-if>
+      </template>
+    </oj-table>         
 
 </div>     
 <br>
-<div style="width: 1px; min-width: 100%;">   
-</div>

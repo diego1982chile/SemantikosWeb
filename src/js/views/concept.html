@@ -51,7 +51,7 @@ and open the template in the editor.
     <oj-tab-bar
         selection="{{selectedItem}}"
         data="[[dataProvider]]"
-        edge="top"
+        edge="top" layout="condense"
         display="all">
         <template slot="itemTemplate" data-oj-as="item">
           <li :class="[[{'oj-disabled' : item.data.disabled === 'true'}]]">
@@ -64,8 +64,12 @@ and open the template in the editor.
     </oj-tab-bar>
     
     <div>
-      <div data-bind="ojModule: { name: 'descriptions', params: {descriptionsModel: conceptModel}}"
+      <div id="descriptions" data-bind="ojModule: { name: 'descriptions', params: {conceptModel: conceptModel}}"
       class="oj-sm-padding-4x">
+      </div>
+      <div id="attributes"
+      class="oj-sm-padding-4x">
+          <h1>Attributes</h1>
       </div>
     </div>
     
