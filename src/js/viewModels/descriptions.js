@@ -19,10 +19,9 @@ define(['knockout',
         'ojs/ojtable',
         'ojs/ojbutton',
         'ojs/ojselectcombobox',
-        'ojs/ojlistitemlayout',
-        'ojs/ojdatacollection-utils',
+        'ojs/ojlistitemlayout',        
         'ojs/ojformlayout'],                 
-function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, DataCollectionEditUtils) {
+function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
     /**
      * The view model for the main content view template
      */        
@@ -89,9 +88,9 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, DataCol
     
             //console.log(self.data());
 
-            return new ListDataProviderView(arrayDataProvider, 
-                                            {filterCriterion: filterCriterion},
-                                            );
+            return new ListDataProviderView(arrayDataProvider, {filterCriterion: filterCriterion});
+                                            
+            //return new BufferingDataProvider(arrayDataProvider);
             
             /*
             self.datasource = new BufferingDataProvider(new oj.ArrayDataProvider(
@@ -157,38 +156,55 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, DataCol
             description.caseSensitive = self.sensibility();
             description.term = self.term();
             description.descriptionType = self.getDescriptionTypeById(self.descriptionType());                    
-
-            params.conceptModel().validDescriptionsButFSNandFavorite.push(description);
             
-            self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);
+            if (!self.dataDescriptions().find(d => d.term+d.caseSensitive+d.descriptionType.name !== data.term+data.caseSensitive+data.descriptionType.name)) {
+                params.conceptModel().validDescriptionsButFSNandFavorite.push(description);           
+                self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);                        
+            }
+            else {
+                alert("ya existe una descripción con estas características");
+            }
             
             console.log(JSON.stringify(self.getDescriptionTypeById(self.descriptionType())));
             
             //console.log(JSON.stringify(params.conceptModel().validDescriptionsButFSNandFavorite));
         };
         
+        self.updateItem = (key, data) => {                                       
+                 
+            console.log(key);      
+            
+            if (!self.dataDescriptions().find(d => d.term+d.caseSensitive+d.descriptionType.name !== data.term+data.caseSensitive+data.descriptionType.name)) {
+                self.dataDescriptions()[key] = data;
+            }        
+            else {
+                alert("ya existe una descripción con estas características");
+            }
+            
+            console.log(JSON.stringify(self.dataDescriptions()));
+                                
+        };
+        
         self.submitRow = (key) => {                                       
                  
             console.log(key);
+            
+            alert("submitRow");
 
+            self.updateItem(key, self.rowData);
+              
             /*
-            $.ajax({                    
-              type: "PUT",
-              url: ko.dataFor(document.getElementById('globalBody')).serviceContext + "/accounts/update",                                        
-              dataType: "json",      
-              data: JSON.stringify(self.rowData),			  		 
-              //crossDomain: true,
-              contentType : "application/json",                    
-              success: function() {                    
-                    alert("Registro grabado correctamente");
-                    var val = $("#filter").val();
-                    $("#filter").val(" ");
-                    $("#filter").val(val);
-              },
-              error: function (request, status, error) {
-                    alert(request.responseText);                          
-              },                                  
-            });
+            const editItem = self.datasource.getSubmittableItems()[0];
+            self.datasource.setItemStatus(editItem, 'submitting');
+            for (let idx = 0; idx < self.dataDescriptions().length; idx++) {
+                if (self.dataDescriptions()[idx].DepartmentId === editItem.item.metadata.key) {
+                    self.dataDescriptions.splice(idx, 1, editItem.item.data);
+                    break;
+                }
+            }
+            // Set the edit item to "submitted" if successful
+            self.datasource.setItemStatus(editItem, 'submitted');
+            self.editedData(JSON.stringify(editItem.item.data));
             */
                                                                            
         };
