@@ -7,16 +7,22 @@
 /**
  * backtest module
  */
-define(['ojs/ojcore','knockout', 
+define(['knockout', 
         'ojs/ojarraydataprovider',     
         "ojs/ojlistdataproviderview",  
         "ojs/ojdataprovider",
         "ojs/ojselectsingle",
+        'ojs/ojinputtext',
         "ojs/ojradioset",
+        'ojs/ojbufferingdataprovider',
         'ojs/ojarraytabledatasource',                
         'ojs/ojtable',
-        'ojs/ojformlayout'], 
-function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
+        'ojs/ojbutton',
+        'ojs/ojselectcombobox',
+        'ojs/ojlistitemlayout',
+        'ojs/ojdatacollection-utils',
+        'ojs/ojformlayout'],                 
+function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, DataCollectionEditUtils) {
     /**
      * The view model for the main content view template
      */        
@@ -59,21 +65,25 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
         
         self.datasource = ko.computed(function () {      
             
-            //console.log(params.conceptModel().validDescriptionsButFSNandFavorite);
+            console.log(params.conceptModel());
             
-            self.dataDescriptions(params);
-                      
-            let filterCriterion = null;                        
+            let filterCriterion = null;  
+            
+            if(params.conceptModel() !== "undefined") {
+                
+                self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);                                           
 
-            if (self.filter() && self.filter() != "") {
-                filterCriterion = ojdataprovider_1.FilterFactory.getFilter({
-                    filterDef: { text: self.filter() },                    
-                    //filterOptions: {textFilterAttributes: ["client"]}
-                });                
-            }                        
+                if (self.filter() && self.filter() != "") {
+                    filterCriterion = ojdataprovider_1.FilterFactory.getFilter({
+                        filterDef: { text: self.filter() },                    
+                        //filterOptions: {textFilterAttributes: ["client"]}
+                    });                
+                }   
+                
+            }                                             
                        
             const arrayDataProvider = new ArrayDataProvider(
-                params.conceptModel().validDescriptionsButFSNandFavorite,
+                self.dataDescriptions(),
                 {idAttribute: 'id'}
             ); 
     
@@ -104,15 +114,15 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
               //console.log(self.data()[rowContext.status.rowIndex]);
               
               //console.log("rowContext.status = " + JSON.stringify(rowContext.status));
-              //console.log("self.data() = " + JSON.stringify(self.data()));
+              //console.log("self.data() = " + JSON.stringify(self.data()));             
               
-              self.getById(rowContext.status.rowKey)
+              //self.originalData = Object.assign({}, self.getById(rowContext.status.rowKey));
+              //self.rowData = Object.assign({}, self.getById(rowContext.status.rowKey));
               
-              self.originalData = Object.assign({}, self.getById(rowContext.status.rowKey));
-              self.rowData = Object.assign({}, self.getById(rowContext.status.rowKey));
+              console.log(rowContext.item.data);
               
-              //self.originalData = Object.assign({}, rowContext.item.data);
-              //self.rowData = Object.assign({}, rowContext.item.data);
+              self.originalData = Object.assign({}, rowContext.item.data);
+              self.rowData = Object.assign({}, rowContext.item.data);
               
               console.log(self.rowData);
         };
@@ -135,10 +145,33 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
             }
         };
         
+        self.addRow = (key) => {                                       
+                 
+            console.log(key);           
+                    
+            var description = {};
+            
+            alert(self.sensibility());
+
+            description.id = self.getRndInteger(1000,100000);
+            description.caseSensitive = self.sensibility();
+            description.term = self.term();
+            description.descriptionType = self.getDescriptionTypeById(self.descriptionType());                    
+
+            params.conceptModel().validDescriptionsButFSNandFavorite.push(description);
+            
+            self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);
+            
+            console.log(JSON.stringify(self.getDescriptionTypeById(self.descriptionType())));
+            
+            //console.log(JSON.stringify(params.conceptModel().validDescriptionsButFSNandFavorite));
+        };
+        
         self.submitRow = (key) => {                                       
                  
             console.log(key);
 
+            /*
             $.ajax({                    
               type: "PUT",
               url: ko.dataFor(document.getElementById('globalBody')).serviceContext + "/accounts/update",                                        
@@ -156,6 +189,7 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
                     alert(request.responseText);                          
               },                                  
             });
+            */
                                                                            
         };
         
@@ -188,7 +222,7 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
         };
         
         self.handleUpdate = (event, context) => {
-            //console.log(context);
+            console.log(context.row);
             self.editRow({ rowKey: context.row.id });
         };
         
@@ -213,11 +247,11 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
             self.filter(document.getElementById("filter").rawValue);
         };
         
-        self.getById = (id) => {                      
+        self.getDescriptionTypeById = (id) => {                      
             
             var toReturn; 
                  
-            $(self.data()).each(function(key,value) {                                 
+            $(self.dataDescriptionTypes()).each(function(key,value) {                                 
                 
                 if(value.id === id) {                    
                     toReturn = value;
@@ -250,6 +284,10 @@ function (oj, ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
               },                                  
             });                                                                           
         };
+        
+        self.getRndInteger = (min, max) => {
+            return Math.floor(Math.random() * (max - min) ) + min;
+        }
                             
     }
        

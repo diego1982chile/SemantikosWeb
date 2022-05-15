@@ -12,6 +12,8 @@ define(['ojs/ojcore','knockout',
         'ojs/ojresponsiveknockoututils',
         'ojs/ojarraydataprovider',
         "ojs/ojradioset",
+        "ojs/ojswitcher",
+        'ojs/ojcollapsible',
         'ojs/ojconverter-number','ojs/ojchart','ojs/ojformlayout'], 
 function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, NumberConverter) {
     /**
@@ -32,7 +34,7 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
         self.favoriteSensibility = ko.observable(false);
         self.favoriteTerm = ko.observable("");
         
-        self.selectedItem = ko.observable("descriptions");             
+        self.selectedItem = ko.observable("descriptions-tab");             
               
         self.dataProvider = ko.observableArray();
         
@@ -69,16 +71,16 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
                 then(function (relationshipDefinitions) {                                        
                     self.relationshipDefinitionsModel(relationshipDefinitions);                     
                     
-                    console.log(self.relationshipDefinitionsModel());
+                    console.log(self.relationshipDefinitionsModel());                                        
                     
-                    if(relationshipDefinitions.length !== 0) {                        
+                    if(relationshipDefinitions.length !== 0) {
                         self.tabs([
-                            { name: "Otras Descripciones", id: "descriptions" },
-                            { name: "Atributos", id: "Attributes"}
+                            { name: "Otras Descripciones", id: "descriptions-tab" },
+                            { name: "Atributos", id: "attributes-tab"}
                         ]);                                                    
                     }
                     else {                                
-                        self.tabs([{ name: "Otras Descripciones", id: "descriptions" }]);                         
+                        self.tabs([{ name: "Otras Descripciones", id: "descriptions-tab" }]);                         
                     }
                     
             });                          

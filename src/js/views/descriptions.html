@@ -4,14 +4,26 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 <STYLE TYPE="text/css">
-<!--
-  /*@import url(css/oj-redwood-min.css);*/
--->
+     
+    
+    .oj-table-column-header-cell {
+        width: 30%;        
+    }
+    
+    .table-world-wrap {
+        white-space:normal;word-wrap:break-word; text-align: center;vertical-align: top;
+     }
+     
+    .oj-table-column-header-cell:last-child {
+        width: 70px;      
+    }
+    
+    
 </STYLE>
 <div id="circle"></div>
 <div class="">
      
-    <oj-form-layout id="ofl1" label-edge="inside" max-columns="1">
+    <oj-form-layout id="ofl1" label-edge="start" class="oj-form-control-full-width" max-columns="1">
         <oj-select-single 
               id="descriptionType" 
               label-hint="Tipo Descriptor"                    
@@ -24,6 +36,7 @@ and open the template in the editor.
         <oj-radioset
             label-hint="Sensibilidad"
             id="sensibility"
+            required
             value="{{sensibility}}">
             <oj-option value="false">Insensible</oj-option>
             <oj-option value="true">Sensible</oj-option>
@@ -33,9 +46,16 @@ and open the template in the editor.
           id="term-fsn"
           label-hint="Término"
           rows="1" style="width:100%"
-          slot="value"          
+          slot="value"
+          required
           value="{{term}}">              
         </oj-text-area>
+        
+        <div slot="footer">
+          <oj-button id="okButton" chroming="callToAction" on-oj-action="[[addRow]]">
+              Submit
+          </oj-button>
+        </div>
     </oj-form-layout>
     
     <oj-table id="table"
@@ -53,23 +73,26 @@ and open the template in the editor.
                         {"field":"term",
                          "sortable": "enabled",
                          "headerText": "Término",
+                         "className": "table-world-wrap",
                          "weight": "2",
                          "minWidth": "10rem",
                          "template": "termTemplate"},
                         {"field":"descriptionType",
                           "headerText": "Tipo Descriptor",
+                          "headerStyle": "text-align: center;",
+                          "style": "padding-top: 0px; padding-bottom: 0px; text-align: center;",
                           "sortable": "enabled",
                           "minWidth": "8rem",
                           "weight": "2",
                           "template": "descriptionTypeTemplate"},
                         {"field":"caseSensitive",
-                          "sortable": "enabled",
-                          "weight": "2",
-                          "minWidth": "10rem",
+                          "sortable": "enabled",                                                   
+                          "headerStyle": "text-align: center;",
+                          "style": "padding-top: 0px; padding-bottom: 0px; text-align: center;",
                           "headerText": "Sensibilidad",
                           "template": "caseSensitiveTemplate"},                        
                         { "headerText": "Action",                                                                              
-                          "headerStyle": "text-align: center;",
+                          "headerStyle": "text-align: center;",                          
                           "style":"padding-top: 0px; padding-bottom: 0px; text-align: center;",
                           "template": "actionTemplate"}]'>
 
@@ -89,45 +112,49 @@ and open the template in the editor.
         </oj-bind-if>
 
         <oj-bind-if test='[[cell.mode=="edit"]]'>          
-          <oj-select-single 
+            <oj-combobox-one
               id="descriptionType" 
               label-hint="Tipo Descriptor"                    
               value="{{rowData.descriptionType}}"                        
-              required
-              item-text="[[getItemText]]"
+              required              
               data="[[descriptionTypes]]">
-              <template slot="itemTemplate" data-oj-as="item">
-                  <oj-list-item-layout style="padding:0em">                              
-                      <span>
-                        <oj-bind-text value="[[item.data.name]]"></oj-bind-text>
-                      </span>                       
-                  </oj-list-item-layout>
-              </template>
-          </oj-select-single>  
+                <oj-bind-for-each data="[[descriptionTypes]]">
+                    <template>
+                      <oj-option value="[[$current.data]]">
+                          <span>
+                            <oj-bind-text value="[[$current.data.name]]"></oj-bind-text>
+                          </span>
+                        </oj-option>
+                    </template>
+                </oj-bind-for-each>
+            </oj-combobox-one> 
+            
         </oj-bind-if>
       </template>              
         
       <template slot="caseSensitiveTemplate" data-oj-as="cell">
-        <oj-bind-if test='[[cell.mode=="navigation"]]'>
-          <oj-bind-text value="[[cell.data]]"></oj-bind-text>
+        <oj-bind-if test='[[cell.mode=="navigation"]]'>            
+            <oj-bind-if test='[[cell.data=="true"]]'>
+                sensible
+            </oj-bind-if>
+            <oj-bind-if test='[[cell.data=="false"]]'>
+                insensible
+            </oj-bind-if>
         </oj-bind-if>
 
-        <oj-bind-if test='[[cell.mode=="edit"]]'>          
-          <oj-select-single 
+        <oj-bind-if test='[[cell.mode=="edit"]]'>                                  
+            
+            <oj-combobox-one
               id="descriptionType" 
-              label-hint="Sensibilidad"                    
+              label-hint="Tipo Descriptor"                    
               value="{{rowData.caseSensitive}}"                        
               required
               item-text="[[getItemText]]"
-              data="[[caseSensitives]]">
-              <template slot="itemTemplate" data-oj-as="item">
-                  <oj-list-item-layout style="padding:0em">                              
-                      <span>
-                        <oj-bind-text value="[[item.data]]"></oj-bind-text>
-                      </span>                       
-                  </oj-list-item-layout>
-              </template>
-          </oj-select-single>  
+              data="[[descriptionTypes]]">
+                <oj-option value="false">insensible</oj-option>
+                <oj-option value="true">sensible</oj-option>
+          </oj-combobox-one>  
+            
         </oj-bind-if>
       </template>
         
@@ -152,6 +179,29 @@ and open the template in the editor.
           </oj-toolbar>
         </oj-bind-if>
       </template>
+        
+      <template slot="actionTemplate" data-oj-as="cell">
+        <oj-bind-if test='[[cell.mode=="navigation"]]'>
+          <oj-button display='icons' chroming='borderless'>
+            <span slot='startIcon' class="oj-ux-ico-edit"></span>
+            Edit
+          </oj-button>
+        </oj-bind-if>
+
+        <oj-bind-if test='[[cell.mode=="edit"]]'>
+          <oj-toolbar class="oj-sm-padding-0-vertical">
+            <oj-button display='icons' on-oj-action="[[handleDone]]">
+              <span slot='startIcon' class="oj-ux-ico-check"></span>
+              Save
+            </oj-button>
+            <oj-button display='icons' on-oj-action="[[handleCancel]]">
+              <span slot='startIcon' class="oj-ux-ico-multiply"></span>
+              Cancel
+            </oj-button>
+          </oj-toolbar>
+        </oj-bind-if>
+      </template>
+        
     </oj-table>         
 
 </div>     
