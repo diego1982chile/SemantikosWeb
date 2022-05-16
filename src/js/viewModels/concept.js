@@ -42,7 +42,7 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
         
         self.tabs = ko.observableArray();               
         
-        self.relationshipDefinitionsModel = ko.observableArray();
+        self.relationshipDefinitionsModel = ko.observableArray();        
         
         self.conceptModel1 = ko.computed(function () {
             

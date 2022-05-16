@@ -20,8 +20,9 @@ define(['knockout',
         'ojs/ojbutton',
         'ojs/ojselectcombobox',
         'ojs/ojlistitemlayout',        
-        'ojs/ojformlayout'],                 
-function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
+        'ojs/ojformlayout',
+        'ojs/ojknockout-validation'],                 
+function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, AsyncRegExpValidator) {
     /**
      * The view model for the main content view template
      */        
@@ -34,7 +35,7 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
         /* Variables */
         self.id = ko.observable(1);
         
-        self.sensibility = ko.observable(false);
+        self.sensibility = ko.observable("false");
         self.term = ko.observable("");   
         self.descriptionType = ko.observable();
         
@@ -65,6 +66,10 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
         self.datasource = ko.computed(function () {      
             
             console.log(params.conceptModel());
+            
+            self.sensibility("false");
+            self.term("");   
+            self.descriptionType(null);
             
             let filterCriterion = null;  
             
@@ -110,13 +115,7 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
               self.cancelEdit = false;
               const rowContext = event.detail.rowContext;
               //console.log(rowContext.status);
-              //console.log(self.data()[rowContext.status.rowIndex]);
-              
-              //console.log("rowContext.status = " + JSON.stringify(rowContext.status));
-              //console.log("self.data() = " + JSON.stringify(self.data()));             
-              
-              //self.originalData = Object.assign({}, self.getById(rowContext.status.rowKey));
-              //self.rowData = Object.assign({}, self.getById(rowContext.status.rowKey));
+              //console.log(self.data()[rowContext.status.rowIndex]);             
               
               console.log(rowContext.item.data);
               
@@ -146,35 +145,71 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
         
         self.addRow = (key) => {                                       
                  
-            console.log(key);           
+            console.log(key);   
+            
+            let element3 = document.getElementById("descriptionTypePlaceHolder");
+            let element4 = document.getElementById("termPlaceHolder");                                    
+                                                           
+            element3.validate().then((result3) => {                
+                element4.validate().then((result4) => { 
                     
-            var description = {};
-            
-            alert(self.sensibility());
+                    if(result3 === 'invalid' || result4 === 'invalid') {
+                        return false;
+                    }
+                    
+                    var description = {};
 
-            description.id = self.getRndInteger(1000,100000);
-            description.caseSensitive = self.sensibility();
-            description.term = self.term();
-            description.descriptionType = self.getDescriptionTypeById(self.descriptionType());                    
-            
-            if (!self.dataDescriptions().find(d => d.term+d.caseSensitive+d.descriptionType.name !== data.term+data.caseSensitive+data.descriptionType.name)) {
-                params.conceptModel().validDescriptionsButFSNandFavorite.push(description);           
-                self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);                        
-            }
-            else {
-                alert("ya existe una descripción con estas características");
-            }
-            
-            console.log(JSON.stringify(self.getDescriptionTypeById(self.descriptionType())));
+                    description.id = self.getRndInteger(1000,100000);
+                    description.caseSensitive = self.sensibility();
+                    description.term = self.term();
+                    description.descriptionType = self.getDescriptionTypeById(self.descriptionType());   
+
+                    var result = self.itemExists(description);
+
+                    if (!result) {
+                        params.conceptModel().validDescriptionsButFSNandFavorite.push(description);           
+                        self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);                        
+                        self.clearPlaceHolders();
+                    }
+                    else {
+                        alert("ya existe una descripción con estas características");
+                    }                              
+
+                    console.log(JSON.stringify(self.getDescriptionTypeById(self.descriptionType()))); 
+                });
+            }); 
             
             //console.log(JSON.stringify(params.conceptModel().validDescriptionsButFSNandFavorite));
         };
         
+        self.clearPlaceHolders = () => {
+            self.sensibility("false");
+            self.term("");
+            self.descriptionType(null);
+        }       
+        
+        self.itemExists = (data) => {
+            var result = false;
+            
+            $(self.dataDescriptions()).each(function(key,value) { 
+                console.log("value = " + JSON.stringify(value));
+                console.log("data = " + JSON.stringify(data));
+                if(value.term === data.term && 
+                    value.caseSensitive === data.caseSensitive &&
+                    value.descriptionType.name === data.descriptionType.name) {                    
+                    result = true;
+                }                
+            });
+            return result;
+        }
+        
         self.updateItem = (key, data) => {                                       
                  
-            console.log(key);      
+            console.log(key);    
             
-            if (!self.dataDescriptions().find(d => d.term+d.caseSensitive+d.descriptionType.name !== data.term+data.caseSensitive+data.descriptionType.name)) {
+            var result = self.itemExists(data);
+            
+            if (!result) {
                 self.dataDescriptions()[key] = data;
             }        
             else {
@@ -188,24 +223,8 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1) {
         self.submitRow = (key) => {                                       
                  
             console.log(key);
-            
-            alert("submitRow");
 
-            self.updateItem(key, self.rowData);
-              
-            /*
-            const editItem = self.datasource.getSubmittableItems()[0];
-            self.datasource.setItemStatus(editItem, 'submitting');
-            for (let idx = 0; idx < self.dataDescriptions().length; idx++) {
-                if (self.dataDescriptions()[idx].DepartmentId === editItem.item.metadata.key) {
-                    self.dataDescriptions.splice(idx, 1, editItem.item.data);
-                    break;
-                }
-            }
-            // Set the edit item to "submitted" if successful
-            self.datasource.setItemStatus(editItem, 'submitted');
-            self.editedData(JSON.stringify(editItem.item.data));
-            */
+            self.updateItem(key, self.rowData);             
                                                                            
         };
         

@@ -58,7 +58,7 @@ and open the template in the editor.
             
             <oj-tab-bar
                 selection="{{selectedItem}}"
-                data="[[dataProvider]]"                
+                data="[[dataProvider]]" class="oj-tabbar oj-divider-bottom"                
                 edge="top" layout="condense"
                 display="all">
                 <template slot="itemTemplate" data-oj-as="item">
@@ -75,7 +75,7 @@ and open the template in the editor.
     
         <div class="demo-switcher-container" style="width:100%">
             <oj-switcher value="[[selectedItem]]">            
-                <div slot="descriptions-tab" id="descriptions-tab-panel" role="tabpanel" aria-labelledby="descriptions_tab">
+                <div slot="descriptions-tab" class="oj-panel" id="descriptions-tab-panel" role="tabpanel" aria-labelledby="descriptions_tab">
                     <div id="other-descriptions" data-bind="ojModule: { name: 'descriptions', params: {conceptModel: conceptModel}}"
                     class="oj-sm-padding-4x">
                     </div>

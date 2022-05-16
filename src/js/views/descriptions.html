@@ -25,7 +25,7 @@ and open the template in the editor.
      
     <oj-form-layout id="ofl1" label-edge="start" class="oj-form-control-full-width" max-columns="1">
         <oj-select-single 
-              id="descriptionType" 
+              id="descriptionTypePlaceHolder" 
               label-hint="Tipo Descriptor"                    
               value="{{descriptionType}}"                        
               required
@@ -35,7 +35,7 @@ and open the template in the editor.
         
         <oj-radioset
             label-hint="Sensibilidad"
-            id="sensibility"
+            id="sensibilityPlaceHolder"
             required
             value="{{sensibility}}">
             <oj-option value="false">Insensible</oj-option>
@@ -43,7 +43,7 @@ and open the template in the editor.
         </oj-radioset>
         
         <oj-text-area
-          id="term-fsn"
+          id="termPlaceHolder"
           label-hint="Término"
           rows="3" style="width:100%"
           slot="value"
