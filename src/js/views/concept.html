@@ -39,12 +39,14 @@ and open the template in the editor.
             <oj-radioset
                     label-hint="Sensibilidad"
                     id="sensibility-fsn"
+                    required
                     value="{{favoriteSensibility}}">
                     <oj-option value="false">Insensible</oj-option>
                     <oj-option value="true">Sensible</oj-option>
             </oj-radioset>
             <oj-text-area
-              id="term-fsn"
+              id="term-favourite"
+              required
               label-hint="Término"
               rows="3" style="width:100%"
               slot="value"          
@@ -88,9 +90,17 @@ and open the template in the editor.
         </div>
 
     </div>
-          
+              
+</div>    
 
-</div>     
+<br/>
+
+<div slot="footer" style="text-align:right">
+    <oj-button id="okButton" chroming="callToAction" on-oj-action="[[submitConcept]]">
+        Submit
+    </oj-button>
+</div>
+
 <br>
 <div style="width: 1px; min-width: 100%;">   
 </div>

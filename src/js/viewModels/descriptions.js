@@ -8,7 +8,7 @@
  * backtest module
  */
 define(['knockout', 
-        'ojs/ojarraydataprovider',     
+        'ojs/ojarraydataprovider',           
         "ojs/ojlistdataproviderview",  
         "ojs/ojdataprovider",
         "ojs/ojselectsingle",
@@ -73,7 +73,7 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, AsyncRe
             
             let filterCriterion = null;  
             
-            if(params.conceptModel() !== "undefined") {
+            if(params.conceptModel()) {
                 
                 self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);                                           
 
@@ -267,10 +267,9 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, AsyncRe
         
         self.handleCancel = () => {                                                                 
             
-            var txt;
             var r = confirm("¿Está seguro que desea eliminar el registro?");
             
-            if (r == true) {
+            if (r === true) {
                 self.deleteRow(self.rowData.id);
             } else {              
                 self.cancelEdit = true;
@@ -301,23 +300,23 @@ function (ko, ArrayDataProvider, ListDataProviderView, ojdataprovider_1, AsyncRe
         self.deleteRow = (key) => {                                       
                  
             console.log(key);
+            var index = 0;
+            var found = false;
 
-            $.ajax({                    
-              type: "DELETE",
-              url: ko.dataFor(document.getElementById('globalBody')).serviceContext + "/accounts/delete/" + key,                                        
-              dataType: "json",                    
-              //crossDomain: true,
-              contentType : "application/json",                    
-              success: function() {                    
-                    alert("Registro borrado correctamente");
-                    var val = $("#filter").val();
-                    $("#filter").val(" ");
-                    $("#filter").val(val);
-              },
-              error: function (request, status, error) {
-                    alert(request.responseText);                          
-              },                                  
-            });                                                                           
+            $(self.dataDescriptions()).each(function(k,value) { 
+                if(value.id === key) {                    
+                    found = true;
+                    return false;
+                }          
+                index++;
+            }); 
+            
+            alert(index);
+            
+            if(found) {
+                params.conceptModel().validDescriptionsButFSNandFavorite.splice(index,1);
+                self.dataDescriptions(params.conceptModel().validDescriptionsButFSNandFavorite);
+            }            
         };
         
         self.getRndInteger = (min, max) => {

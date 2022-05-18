@@ -28,10 +28,10 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
         /* Variables */
         self.id = ko.observable(1);
         
-        self.fsnSensibility = ko.observable(false);
+        self.fsnSensibility = ko.observable("false");
         self.fsnTerm = ko.observable("");   
         
-        self.favoriteSensibility = ko.observable(false);
+        self.favoriteSensibility = ko.observable("false");
         self.favoriteTerm = ko.observable("");
         
         self.selectedItem = ko.observable("descriptions-tab");             
@@ -56,9 +56,9 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
             $.getJSON("http://dnssemantikos:8080/ws/rest/concepts/new/" + categoryId).
                 then(function (concept) {                    
                     console.log(JSON.stringify(concept.validDescriptionsButFSNandFavorite));
-                    self.conceptModel(concept);  
+                    self.conceptModel(concept);
                     
-                    console.log(self.conceptModel());
+                    console.log("self.conceptModel() = " + JSON.stringify(self.conceptModel()));
                     
                     self.fsnSensibility(concept.validDescriptionFSN.caseSensitive.toString());
                     self.fsnTerm(concept.validDescriptionFSN.term);   
@@ -89,8 +89,49 @@ function (oj, ko, responsiveUtils, responsiveKnockoutUtils, ArrayDataProvider, N
         });
         
          self.dataProvider = new ArrayDataProvider(self.tabs, { keyAttributes: "id" });
-                
-                            
+                                            
+    }
+    
+    self.submitConcept = function (event, data) {
+            
+        let element1 = document.getElementById("term-favourite");
+
+        let valid = false;
+        // validate them both, and when they are both done
+        // validating and valid, submit the form.
+        // Calling validate() will update the component's
+        // valid property
+        element1.validate().then((result1) => {
+
+            if (result1 === "valid") {
+                // submit the form would go here
+                //alert("everything is valid; submit the form");                
+
+                //self.conceptModel().validDescriptionFavorite.term = self.favoriteTerm();
+                //self.conceptModel().validDescriptionFavorite.caseSensitive = self.favoriteSensibility();                
+
+                console.log(JSON.stringify(self.conceptModel));
+
+                //alert(JSON.stringify(account));
+
+                $.ajax({                    
+                    type: "POST",
+                    url: ko.dataFor(document.getElementById('globalBody')).serviceContext + "/concepts/submit",                                        
+                    dataType: "json",      
+                    data: JSON.stringify(account),			  		 
+                    //crossDomain: true,
+                    contentType : "application/json",                    
+                    success: function() {                    
+                        alert("Registro grabado correctamente");
+                        $("input").val("");                                          
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);                          
+                    }                                  
+                });            
+            }
+        });
+
     }
        
     return conceptContentViewModel;
